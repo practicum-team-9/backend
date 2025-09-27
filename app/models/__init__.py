@@ -1,1 +1,1 @@
-from .form import Form  # noqa
+from .form import YandexForm  # noqa

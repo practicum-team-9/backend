@@ -3,7 +3,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.db import Base
 
 
-class Form(Base):
+class YandexForm(Base):
     """Модель формы."""
 
     name: Mapped[str] = mapped_column(nullable=False)
