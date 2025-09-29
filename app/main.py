@@ -2,9 +2,21 @@ from fastapi import FastAPI
 
 from app.api.routers import main_router
 from app.core.config import settings
-from app.api.endpoints import form
 
-app = FastAPI(title=settings.app_title)
+
+app = FastAPI(
+    title=settings.app_title,
+    description=settings.description
+)
 
 app.include_router(main_router)
-app.include_router(form.router, tags=["Forms"])
+
+if __name__ == "__main__":
+
+    import uvicorn
+    uvicorn.run(
+        "main:app",
+        host="127.0.0.1",
+        port=8001,
+        reload=True
+    )

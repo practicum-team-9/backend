@@ -1,7 +1,8 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class FormBase(BaseModel):
+    """Базовая схема формы"""
     name: str
     url: str
 
@@ -15,5 +16,4 @@ class FormDB(FormBase):
     """Схема для возврата формы из БД"""
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
