@@ -25,7 +25,7 @@ class Settings(BaseSettings):
             f'/{self.postgres_db}'
         )
 
-    model_config = SettingsConfigDict(env_file='.env', case_sensitive=False, extra='allow')
+    model_config = SettingsConfigDict(env_file='.env', case_sensitive=False)
 
 
 settings = Settings()
