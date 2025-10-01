@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.schemas.form import FormCreate, FormDB
+from app.schemas.form import FormCreate, FormDB, FormUpdate, FormByID
 from app.crud.form import form_crud
 from app.core.db import get_async_session
 from app.api.validators import validate_form_exists
@@ -9,6 +9,8 @@ from app.services.service import get_forms
 from app.api.common_params import pagination_params, filter_params
 
 router = APIRouter()
+
+
 
 
 @router.get(
@@ -46,3 +48,28 @@ async def delete_form(
 ):
     await form_crud.remove(form, session)
     return {"detail": f"Форма с id={form.id} успешно удалена"}
+
+
+@router.put(
+    "/update-form/{form_id}",
+    response_model=FormDB,
+    summary="Обновить форму по ID"
+)
+async def update_form(
+    form_update: FormUpdate,
+    form: FormDB = Depends(validate_form_exists),
+    session: AsyncSession = Depends(get_async_session)
+):
+    return await form_crud.update(form, form_update, session)
+
+
+@router.get(
+    "/get-form/{form_id}",
+    response_model=FormByID,
+    summary="Получить форму по ID"
+)
+async def get_form(
+    form: FormByID = Depends(validate_form_exists),
+):
+    form.telegram_link = f"http://ta.me/{form.id}" # Добавить метод генерации ссылки на ТГ бота, когда он будет готов
+    return form

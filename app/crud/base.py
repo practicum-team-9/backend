@@ -42,3 +42,12 @@ class CRUDBase:
     ):
         await session.delete(db_obj)
         await session.commit()
+
+    async def update(self, db_obj, obj_in, session: AsyncSession):
+        obj_data = obj_in.dict(exclude_unset=True)
+        for field, value in obj_data.items():
+            setattr(db_obj, field, value)
+        session.add(db_obj)
+        await session.commit()
+        await session.refresh(db_obj)
+        return db_obj
