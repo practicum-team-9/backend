@@ -1,16 +1,16 @@
 from aiogram.types import KeyboardButton, ReplyKeyboardMarkup
-
-from texts import RETRY_SURVEY, SKIP_QUESTION
+from texts import (RETRY_EMOGI_BUTON, RETRY_SURVEY, SKIP_EMOGI_BUTTON,
+                   SKIP_QUESTION)
 
 
 async def get_keyboard_buttons(
     skip_button=True
 ) -> list[list[KeyboardButton]]:
     """Базовые кнопки для клавиатуры."""
-    keyboard_buttons = [[KeyboardButton(text=RETRY_SURVEY[0])]]
+    keyboard_buttons = [[KeyboardButton(text=RETRY_EMOGI_BUTON)]]
     if skip_button:
         keyboard_buttons.append(
-            [KeyboardButton(text=SKIP_QUESTION[0])]
+            [KeyboardButton(text=SKIP_EMOGI_BUTTON)]
         )
     return keyboard_buttons
 

@@ -1,6 +1,8 @@
 import re
 from datetime import datetime
 
+from pydantic import EmailStr
+
 
 def validate_phone_format(phone: str) -> bool:
     """Валидация телефона."""
@@ -15,9 +17,11 @@ def validate_email_format(email: str) -> bool:
     if not email or not email.strip():
         return False
     email = email.strip()
-    return bool(
-        re.match(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$', email)
-    )
+    try:
+        EmailStr._validate(email)
+        return True
+    except Exception:
+        return False
 
 
 def validate_date_format(date: str) -> bool:

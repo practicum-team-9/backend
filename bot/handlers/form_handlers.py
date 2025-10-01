@@ -1,21 +1,22 @@
 from aiogram import Router
 from aiogram.filters import CommandStart, StateFilter
 from aiogram.fsm.context import FSMContext
-from aiogram.types import (KeyboardButton, Message,
-                           ReplyKeyboardMarkup, ReplyKeyboardRemove)
+from aiogram.types import (KeyboardButton, Message, ReplyKeyboardMarkup,
+                           ReplyKeyboardRemove)
+from services.speechkit import SpeechKitService
+from services.yandex_forms import YandexFormsService
+from states.form_states import FormFilling
 
 from bot.data_models.forms import FormItem, QuestionType
 from bot.database.db_manager import DatabaseManager
 from bot.keyboards import get_keyboard_buttons, get_keyboard_by_buttons
 from bot.texts import (BOOL_QUESTION, CHOICE_QUESTION, COMPLETION_MESSAGE,
                        DATE_QUESTION, OPTIONAL_QUESTION, REQUIRED_QUESTION,
-                       RETRY_SURVEY, SKIP_QUESTION, START_SURVEY,
-                       STRING_QUESTION, SUBMIT_ERROR_MESSAGE,
+                       RETRY_SURVEY, SKIP_QUESTION, START_EMOGI_BUTTON,
+                       START_SURVEY, STRING_QUESTION, SUBMIT_ERROR_MESSAGE,
                        WELCOME_INSTRUCTION, WRONG_BOOL_CHOICE, WRONG_CHOICE,
                        WRONG_DATE, WRONG_EMAIL, WRONG_PHONE_FORMAT)
-from services.speechkit import SpeechKitService
-from services.yandex_forms import YandexFormsService
-from states.form_states import FormFilling
+
 from .validators import (validate_date_format, validate_email_format,
                          validate_phone_format)
 
@@ -88,7 +89,7 @@ class FormHandlers:
             ),
             caption="🎧 Инструкция по прохождению анкеты",
             reply_markup=ReplyKeyboardMarkup(
-                keyboard=[[KeyboardButton(text=START_SURVEY[0])]],
+                keyboard=[[KeyboardButton(text=START_EMOGI_BUTTON)]],
                 resize_keyboard=True
             )
         )
@@ -289,9 +290,17 @@ class FormHandlers:
             await self.restart_form(message, state)
         else:
             data = await state.get_data()
-            current_question_id = data.get("current_question_id")
-            # Валидируем телефон
-            if current_question_id == "tel":
+            current_question_index = data.get("current_question_index")
+            current_question = data.get("questions")[current_question_index]
+            validation_type = None
+            validation = current_question.validations
+            for validator in validation:
+                if validator.type == "phone":
+                    validation_type = "phone"
+                if validator.type == "email":
+                    validation_type = "email"
+
+            if validation_type == "phone":
                 if not validate_phone_format(message.text):
 
                     await message.answer_voice(
@@ -303,8 +312,8 @@ class FormHandlers:
                     )
                     return
                 answer = message.text
-            # Валидируем email
-            elif current_question_id == "email":
+
+            elif validation_type == "email":
                 if not validate_email_format(message.text):
                     await message.answer_voice(
                         voice=await self.speech_service.text_to_speech(
@@ -332,7 +341,7 @@ class FormHandlers:
             questions = data.get("questions", [])
             question = questions[current_question_index]
             selected_item = None
-            
+
             for item in question.items:
                 if item.label.lower() == message.text.lower():
                     selected_item = item

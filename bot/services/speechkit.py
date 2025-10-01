@@ -47,8 +47,8 @@ class SpeechKitService:
         }
         data = {
             "text": text,
-            "lang": "ru-RU",
-            "voice": "alena"
+            "lang": settings.VOICE_LANG,
+            "voice": settings.VOICE_NAME
         }
         async with aiohttp.ClientSession() as session:
             async with session.post(
@@ -59,4 +59,5 @@ class SpeechKitService:
                 if response.status == 200:
                     return await response.read()
                 else:
-                    raise Exception("SpeechKit error")
+                    raise Exception(
+                        f"SpeechKit error: status {response.status}")

@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     # Данные для работы со SpeechKit.
     SPEECH_KIT_API_KEY: str
     SPEECH_KIT_URL: str
+    VOICE_LANG: str
+    VOICE_NAME: str
 
     # Данные для работы с Яндекс Формами.
     YANDEX_FORMS_URL: str
@@ -31,8 +33,8 @@ class Settings(BaseSettings):
         )
 
     model_config = SettingsConfigDict(
-        env_file='.env',
-        extra='allow'
+        env_file=".env",
+        extra="allow"
     )
 
 

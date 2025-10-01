@@ -1,6 +1,7 @@
 from typing import Any, Dict, List
 
 import aiohttp
+from pydantic import TypeAdapter
 
 from bot.config import settings
 from bot.data_models.forms import FormItem, QuestionType
@@ -11,6 +12,8 @@ class YandexFormsService:
 
     def __init__(self):
         self.base_url = settings.YANDEX_FORMS_URL
+        self.pages_adapter = TypeAdapter(List[Dict[str, Any]])
+        self.items_adapter = TypeAdapter(List[Dict[str, Any]])
 
     def _extract_survey_id(self, form_url: str) -> str:
         """Метод для извлечения идентификатора формы из url."""
@@ -35,28 +38,28 @@ class YandexFormsService:
 
     def _parse_form_structure(self, form_data: Dict[str, Any]) -> List[FormItem]:
         """Метод для извлечения данных из формы в нужном формате."""
-        questions = []
 
-        pages = form_data.get("pages", form_data.get(
-            "data", {}).get("pages", []))
+        pages = self.pages_adapter.validate_python(
+            form_data.get("pages", form_data.get("data", {}).get("pages", []))
+        )
 
-        for page in pages:
-            items = page.get("items", [])
-            for item_data in items:
-                question = FormItem(
-                    id=item_data.get("id", ""),
-                    label=item_data.get("label", ""),
-                    type=item_data.get("type", "string"),
-                    multiline=item_data.get("multiline", False),
-                    widget=item_data.get("widget"),
-                    items=[
-                        {"id": opt.get("id"), "label": opt.get("label")}
-                        for opt in item_data.get("items", [])
-                    ],
-                    validations=item_data.get("validations", []),
-                    comment=item_data.get("comment")
-                )
-                questions.append(question)
+        questions = [
+            FormItem(
+                id=item_data.get("id", ""),
+                label=item_data.get("label", ""),
+                type=item_data.get("type", "string"),
+                multiline=item_data.get("multiline", False),
+                widget=item_data.get("widget"),
+                items=[
+                    {"id": opt.get("id"), "label": opt.get("label")}
+                    for opt in item_data.get("items", [])
+                ],
+                validations=item_data.get("validations", []),
+                comment=item_data.get("comment")
+            )
+            for page in pages
+            for item_data in self.items_adapter.validate_python(page.get("items", []))
+        ]
 
         return questions
 
