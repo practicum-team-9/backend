@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -17,3 +19,9 @@ class FormDB(FormBase):
     id: int
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class FormUpdate(BaseModel):
+    """Схема для изменения полей формы"""
+    name: Optional[str] = None
+    description: Optional[str] = None
