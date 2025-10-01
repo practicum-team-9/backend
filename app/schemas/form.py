@@ -25,3 +25,10 @@ class FormUpdate(BaseModel):
     """Схема для изменения полей формы"""
     name: Optional[str] = None
     description: Optional[str] = None
+
+
+class FormByID(FormBase):
+    """Схема для возврата формы из БД по ID с ссылкой на бота"""
+    id: int
+    telegram_link: Optional[str] = None
+    model_config = ConfigDict(from_attributes=True)

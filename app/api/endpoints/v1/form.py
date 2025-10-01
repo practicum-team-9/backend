@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.schemas.form import FormCreate, FormDB, FormUpdate
+from app.schemas.form import FormCreate, FormDB, FormUpdate, FormByID
 from app.crud.form import form_crud
 from app.core.db import get_async_session
 from app.api.validators import validate_form_exists
@@ -65,10 +65,11 @@ async def update_form(
 
 @router.get(
     "/get-form/{form_id}",
-    response_model=FormDB,
+    response_model=FormByID,
     summary="Получить форму по ID"
 )
 async def get_form(
-    form: FormDB = Depends(validate_form_exists),
+    form: FormByID = Depends(validate_form_exists),
 ):
+    form.telegram_link = f"http://ta.me/{form.id}" # Добавить метод генерации ссылки на ТГ бота, когда он будет готов
     return form
