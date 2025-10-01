@@ -14,6 +14,8 @@ class Settings(BaseSettings):
     postgres_user: str = 'Пользователь базы данных'
     postgres_password: str = 'Пароль от базы данных'
     postgres_db: str = 'Название базы данных'
+    tg_bot_url: str = 'Ссылка на бота'
+    self_url: str = 'Домен/IP сервера'
 
     @property
     def database_url(self):

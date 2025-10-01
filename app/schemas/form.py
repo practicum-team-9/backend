@@ -27,8 +27,9 @@ class FormUpdate(BaseModel):
     description: Optional[str] = None
 
 
-class FormByID(FormBase):
-    """Схема для возврата формы из БД по ID с ссылкой на бота"""
+class FormWithURLs(FormBase):
+    """Схема для возврата формы из БД с доп. ссылками."""
     id: int
-    telegram_link: Optional[str] = None
+    tg_bot_url: Optional[str] = None
+    self_page_path: Optional[str] = None
     model_config = ConfigDict(from_attributes=True)

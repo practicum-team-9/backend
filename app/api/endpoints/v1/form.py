@@ -1,21 +1,20 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.schemas.form import FormCreate, FormDB, FormUpdate, FormByID
+from app.schemas.form import FormCreate, FormDB, FormUpdate, FormWithURLs
 from app.crud.form import form_crud
 from app.core.db import get_async_session
 from app.api.validators import validate_form_exists
 from app.services.service import get_forms
 from app.api.common_params import pagination_params, filter_params
+from app.api.utils import generate_urls
 
 router = APIRouter()
 
 
-
-
 @router.get(
     "/get-all-forms/",
-    response_model=list[FormDB],
+    response_model=list[FormWithURLs],
     summary="Получить все формы"
 )
 async def get_all_forms(
@@ -23,7 +22,18 @@ async def get_all_forms(
     pagination: dict = Depends(pagination_params),
     filters: dict = Depends(filter_params)
 ):
-    return await get_forms(session, **pagination, **filters)
+    result = []
+    all_forms = await get_forms(session, **pagination, **filters)
+    for form in all_forms:
+        identifier = form.url.split("/")[-2]
+        links = await generate_urls(identifier=identifier, id=form.id)
+        result.append(
+            FormWithURLs(
+                **form.__dict__,
+                **links
+            )
+        )
+    return result
 
 
 @router.post(
@@ -65,11 +75,18 @@ async def update_form(
 
 @router.get(
     "/get-form/{form_id}",
-    response_model=FormByID,
+    response_model=FormWithURLs,
     summary="Получить форму по ID"
 )
 async def get_form(
-    form: FormByID = Depends(validate_form_exists),
+    form_id: int,
+    session: AsyncSession = Depends(get_async_session),
 ):
-    form.telegram_link = f"http://ta.me/{form.id}" # Добавить метод генерации ссылки на ТГ бота, когда он будет готов
-    return form
+    form = await validate_form_exists(form_id=form_id, session=session)
+    identifier = form.url.split("/")[-2]
+    links = await generate_urls(identifier=identifier, id=form.id)
+
+    return FormWithURLs(
+        **form.__dict__,
+        **links
+    )

@@ -1,0 +1,1 @@
+from .generate_urls_for_db_objects import generate_urls
