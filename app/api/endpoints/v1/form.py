@@ -7,7 +7,7 @@ from app.core.db import get_async_session
 from app.api.validators import validate_form_exists
 from app.services.service import get_forms
 from app.api.common_params import pagination_params, filter_params
-from app.api.utils import generate_urls
+from app.api.utils import generate_self_url, generate_tg_url
 
 router = APIRouter()
 
@@ -26,11 +26,11 @@ async def get_all_forms(
     all_forms = await get_forms(session, **pagination, **filters)
     for form in all_forms:
         identifier = form.url.split("/")[-2]
-        links = await generate_urls(identifier=identifier, id=form.id)
         result.append(
             FormWithURLs(
+                self_page_path=await generate_self_url(form.id),
+                tg_bot_url=await generate_tg_url(identifier),
                 **form.__dict__,
-                **links
             )
         )
     return result
@@ -38,14 +38,21 @@ async def get_all_forms(
 
 @router.post(
     "/add-form/",
-    response_model=FormDB,
+    response_model=FormWithURLs,
     summary="Добавить новую форму"
 )
 async def add_form(
     form: FormCreate,
     session: AsyncSession = Depends(get_async_session)
 ):
-    return await form_crud.create(form, session)
+    new_form = await form_crud.create(form, session)
+    identifier = new_form.url.split("/")[-2]
+    return FormWithURLs(
+        self_page_path=await generate_self_url(new_form.id),
+        tg_bot_url=await generate_tg_url(identifier),
+        **new_form.__dict__,
+    )
+
 
 
 @router.delete(
@@ -62,7 +69,7 @@ async def delete_form(
 
 @router.put(
     "/update-form/{form_id}",
-    response_model=FormDB,
+    response_model=FormWithURLs,
     summary="Обновить форму по ID"
 )
 async def update_form(
@@ -70,7 +77,13 @@ async def update_form(
     form: FormDB = Depends(validate_form_exists),
     session: AsyncSession = Depends(get_async_session)
 ):
-    return await form_crud.update(form, form_update, session)
+    updated_form = await form_crud.update(form, form_update, session)
+    identifier = updated_form.url.split("/")[-2]
+    return FormWithURLs(
+        self_page_path=await generate_self_url(updated_form.id),
+        tg_bot_url=await generate_tg_url(identifier),
+        **updated_form.__dict__,
+    )
 
 
 @router.get(
@@ -79,14 +92,9 @@ async def update_form(
     summary="Получить форму по ID"
 )
 async def get_form(
-    form_id: int,
-    session: AsyncSession = Depends(get_async_session),
+    form: FormWithURLs = Depends(validate_form_exists)
 ):
-    form = await validate_form_exists(form_id=form_id, session=session)
     identifier = form.url.split("/")[-2]
-    links = await generate_urls(identifier=identifier, id=form.id)
-
-    return FormWithURLs(
-        **form.__dict__,
-        **links
-    )
+    form.tg_bot_url = await generate_tg_url(identifier)
+    form.self_page_path = await generate_self_url(form.id)
+    return form

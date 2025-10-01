@@ -24,7 +24,7 @@ class FormDB(FormBase):
 class FormUpdate(BaseModel):
     """Схема для изменения полей формы"""
     name: Optional[str] = None
-    description: Optional[str] = None
+    url: Optional[str] = None
 
 
 class FormWithURLs(FormBase):

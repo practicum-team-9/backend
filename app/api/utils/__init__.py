@@ -1,1 +1,1 @@
-from .generate_urls_for_db_objects import generate_urls
+from .generate_urls_for_db_objects import generate_tg_url, generate_self_url
