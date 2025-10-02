@@ -31,10 +31,12 @@
 
 ## Установка проекта из репозитория  GitHub.
 ### Установить Python 3.11
+
 <details>
   <summary>Windows</summary>
 https://www.python.org/downloads/
 </details>
+
 <details>
   <summary>Linux & MacOS</summary>
 ```
@@ -43,6 +45,7 @@ sudo apt -y install python3-pip
 sudo apt install python3.11
 ``` 
 </details>
+
 ### Клонировать репозиторий и перейти в него в командной строке.
 ```bash
 https://github.com/practicum-team-9/backend.git
