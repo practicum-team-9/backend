@@ -170,6 +170,7 @@ class FormHandlers:
             elif question_type == "enum":
                 items = question.items
                 question_text += CHOICE_QUESTION
+                question_text += question.label + "."
                 counter = 1
                 for item in items:
                     question_text += str(counter) + "." + item.label + ", "
