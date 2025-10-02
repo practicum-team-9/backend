@@ -39,11 +39,13 @@ https://www.python.org/downloads/
 
 <details>
   <summary>Linux & MacOS</summary>
+  
+```bash
+  sudo apt update
+  sudo apt -y install python3-pip
+  sudo apt install python3.11
 ```
-sudo apt update
-sudo apt -y install python3-pip
-sudo apt install python3.11
-``` 
+
 </details>
 
 ### Клонировать репозиторий и перейти в него в командной строке.
