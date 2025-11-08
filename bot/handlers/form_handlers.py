@@ -186,6 +186,8 @@ class FormHandlers:
                 ),
                 caption=f"🎯 Вопрос {current_index + 1}/{len(questions)}"
             )
+            text_caption = f"🎯 Вопрос {current_index + 1}/{len(questions)}\n\n{question_text}"
+            await message.answer(text_caption)
             await self.setup_question_state(
                 message,
                 state,

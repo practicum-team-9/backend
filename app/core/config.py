@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     db_port: str = 'Порт базы данных'
     postgres_user: str = 'Пользователь базы данных'
     postgres_password: str = 'Пароль от базы данных'
+    admin_username: str = 'Админ'
+    admin_password: str = 'Пароль админа'
     postgres_db: str = 'Название базы данных'
     tg_bot_url: str = 'Ссылка на бота'
     self_url: str = 'Домен/IP сервера'

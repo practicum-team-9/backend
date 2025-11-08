@@ -8,6 +8,7 @@ from app.api.validators import validate_form_exists
 from app.services.service import get_forms
 from app.api.common_params import pagination_params, filter_params
 from app.api.utils import generate_self_url, generate_tg_url
+from app.api.endpoints.v1.auth import check_auth
 
 router = APIRouter()
 
@@ -20,7 +21,8 @@ router = APIRouter()
 async def get_all_forms(
     session: AsyncSession = Depends(get_async_session),
     pagination: dict = Depends(pagination_params),
-    filters: dict = Depends(filter_params)
+    filters: dict = Depends(filter_params),
+    token=Depends(check_auth),
 ):
     result = []
     all_forms = await get_forms(session, **pagination, **filters)
@@ -43,7 +45,8 @@ async def get_all_forms(
 )
 async def add_form(
     form: FormCreate,
-    session: AsyncSession = Depends(get_async_session)
+    session: AsyncSession = Depends(get_async_session),
+    token=Depends(check_auth),
 ):
     new_form = await form_crud.create(form, session)
     identifier = new_form.url.split("/")[-2]
@@ -61,7 +64,8 @@ async def add_form(
 )
 async def delete_form(
     form: FormDB = Depends(validate_form_exists),
-    session: AsyncSession = Depends(get_async_session)
+    session: AsyncSession = Depends(get_async_session),
+    token=Depends(check_auth),
 ):
     await form_crud.remove(form, session)
     return {"detail": f"Форма с id={form.id} успешно удалена"}
@@ -75,7 +79,8 @@ async def delete_form(
 async def update_form(
     form_update: FormUpdate,
     form: FormDB = Depends(validate_form_exists),
-    session: AsyncSession = Depends(get_async_session)
+    session: AsyncSession = Depends(get_async_session),
+    token=Depends(check_auth),
 ):
     updated_form = await form_crud.update(form, form_update, session)
     identifier = updated_form.url.split("/")[-2]
@@ -92,7 +97,8 @@ async def update_form(
     summary="Получить форму по ID"
 )
 async def get_form(
-    form: FormWithURLs = Depends(validate_form_exists)
+    form: FormWithURLs = Depends(validate_form_exists),
+    token=Depends(check_auth),
 ):
     identifier = form.url.split("/")[-2]
     form.tg_bot_url = await generate_tg_url(identifier)
