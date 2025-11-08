@@ -22,7 +22,6 @@ async def get_all_forms(
     session: AsyncSession = Depends(get_async_session),
     pagination: dict = Depends(pagination_params),
     filters: dict = Depends(filter_params),
-    token=Depends(check_auth),
 ):
     result = []
     all_forms = await get_forms(session, **pagination, **filters)
@@ -98,7 +97,6 @@ async def update_form(
 )
 async def get_form(
     form: FormWithURLs = Depends(validate_form_exists),
-    token=Depends(check_auth),
 ):
     identifier = form.url.split("/")[-2]
     form.tg_bot_url = await generate_tg_url(identifier)
