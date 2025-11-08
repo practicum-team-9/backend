@@ -6,4 +6,4 @@ async def generate_tg_url(identifier: str) -> str:
 
 
 async def generate_self_url(id: int) -> str:
-    return settings.self_url + f"/v1/forms/get-form/{id}"
+    return settings.self_url + f"{id}"
