@@ -14,6 +14,14 @@ security = HTTPBearer()
 active_tokens = set()
 
 
+def check_auth(token=Depends(security)):
+    if token.credentials not in active_tokens:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Предоставлен неверный токен"
+        )
+
+
 @router.post("/login")
 def login(login_data: LoginRequest):
     if login_data.username != settings.admin_username or login_data.password != settings.admin_password:
@@ -28,10 +36,14 @@ def login(login_data: LoginRequest):
     return {"access_token": token, "token_type": "Bearer"}
 
 
-def check_auth(token=Depends(security)):
-    if token.credentials not in active_tokens:
+@router.get("/check_token")
+def check_token_is_valid(
+    token=Depends(security),
+):
+    if token.credentials in active_tokens:
+        return {"valid": True}
+    else:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Предоставлен неверный токен"
+            detail="Токен не валиден"
         )
-
