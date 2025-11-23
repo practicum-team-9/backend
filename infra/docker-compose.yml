@@ -1,26 +1,28 @@
 services:
   postgres:
-    container_name: test_db
     image: postgres:13
-    env_file: .env
+    env_file: ../.env
+    restart: unless-stopped
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - invatur
 
   backend:
-    container_name: backend
-    restart: always
+    image: invatur-backend:local
+    restart: unless-stopped
     build:
-      context: .
+      context: ../.
       dockerfile: Dockerfile
-    volumes:
-      - .:/usr/src/app
-      - ./logs/:/app/logs/
-    ports:
-      - "8001:8001"
     depends_on:
       - postgres
     env_file:
-      - .env
+      - ../.env
+    networks:
+      - invatur
 
 volumes:
   postgres_data:
+
+networks:
+  invatur:
