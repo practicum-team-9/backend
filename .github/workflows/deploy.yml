@@ -1,0 +1,63 @@
+---
+name: Prod Deploy
+on:
+  push:
+    branches: [main, devops/test-deploy-main]
+  workflow_dispatch:  # Allow manual triggering
+
+env:
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  deploy:
+    env:
+      # Добавьте сюда дополнительные переменные с префиксом CI_ для
+      # замены шаблонных значений из .env.example -> .env
+      CI_ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+      CI_BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+      CI_POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      CI_SPEECH_KIT_API_KEY: ${{ secrets.SPEECH_KIT_API_KEY }}
+      CI_APP_TITLE: ${{ vars.APP_TITLE }}
+      CI_DESCRIPTION: ${{ vars.DESCRIPTION }}
+      CI_SELF_URL: ${{ vars.SELF_URL }}
+      CI_TG_BOT_URL: ${{ vars.TG_BOT_URL }}
+      CI_TLS_EMAIL: ${{ vars.TLS_EMAIL }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. Checkout repository code
+        uses: actions/checkout@v4
+
+      - name: 2. Create .env file
+        run: |
+          pip3 install dump-env
+          dump-env \
+            -t .env.example \
+            -p 'CI_' \
+            --strict CI_BOT_TOKEN \
+            --strict CI_SPEECH_KIT_API_KEY \
+            --strict CI_ADMIN_PASSWORD > .env
+
+      - name: Copy deploy files to server
+        uses: appleboy/scp-action@v1
+        with:
+          host: ${{ vars.SSH_DEPLOY_HOST }}
+          username: ${{ secrets.SSH_DEPLOY_USER }}
+          key: ${{ secrets.SSH_DEPLOY_KEY }}
+          overwrite: true
+          source: "."
+          target: prod
+
+      - name: ssh deploy commands
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ vars.SSH_DEPLOY_HOST }}
+          username: ${{ secrets.SSH_DEPLOY_USER }}
+          key: ${{ secrets.SSH_DEPLOY_KEY }}
+          script: |
+            cd ~/prod && rm -rf .git .github
+            cd ~/prod/infra
+            run_compose() { docker compose -p prod -f docker-compose.yml -f docker-compose.prod.yml "$@"; }
+            run_compose build -q backend
+            run_compose up -d --quiet-pull
+            run_compose exec backend alembic upgrade head
+            run_compose ps

@@ -1,0 +1,8 @@
+services:
+  backend:
+    ports:
+      - "8001:8001"
+    volumes:
+      - .:/usr/src/app
+      - ./logs/:/app/logs/
+

@@ -1,0 +1,68 @@
+# production instance of reverse_proxy
+# this caddy works in docker network with production
+# database and backend instances.
+
+# Email for Let's Encrypt expiration notices
+{
+	email {$TLS_EMAIL}
+}
+
+# "www" redirect to "non-www" version
+www.{$SELF_URL} {
+	redir https://{$SELF_URL}{uri}
+}
+
+{$SELF_URL} {
+	# HTTPS options:
+	header Strict-Transport-Security max-age=31536000;
+
+	# Removing some headers for improved security:
+	header -Server
+
+	rate_limit {
+		# Enable distributed limitation if you have multiple Caddy nodes.
+		# Works ok for one node.
+		distributed
+
+		zone static {
+			match {
+				method GET
+				path /static/* /media/*
+			}
+			key {remote_host}
+			events 500
+			window 10s
+		}
+
+		zone dynamic {
+			match {
+				not path /static/* /media/*
+			}
+			key {remote_host}
+			events 300
+			window 3s
+		}
+
+		log_key
+	}
+
+  handle /v1/* {
+          reverse_proxy backend:8001
+  }
+
+  # Serve Frontend files
+  handle {
+          root * /var/www/frontend
+          file_server
+          try_files {path} {path}/ /index.html
+  }
+
+	# Dynamically compress response with gzip when it makes sense.
+	# This setting is ignored for precompressed files.
+	encode gzip
+
+	# Logs:
+	log {
+		output stdout
+	}
+}
