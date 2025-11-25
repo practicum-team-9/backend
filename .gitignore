@@ -130,5 +130,4 @@ dmypy.json
 .pyre/
 
 # Alembic
-alembic/versions
 /user1_key
