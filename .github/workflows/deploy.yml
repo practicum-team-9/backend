@@ -46,6 +46,7 @@ jobs:
           overwrite: true
           source: "."
           target: prod
+          rm: true
 
       - name: ssh deploy commands
         uses: appleboy/ssh-action@v1
@@ -54,10 +55,9 @@ jobs:
           username: ${{ secrets.SSH_DEPLOY_USER }}
           key: ${{ secrets.SSH_DEPLOY_KEY }}
           script: |
-            cd ~/prod && rm -rf .git .github
             cd ~/prod/infra
             run_compose() { docker compose -p prod -f docker-compose.yml -f docker-compose.prod.yml "$@"; }
             run_compose build -q backend
             run_compose up -d --quiet-pull
-            run_compose exec backend alembic upgrade heads
+            run_compose exec -it backend alembic upgrade head
             run_compose ps
