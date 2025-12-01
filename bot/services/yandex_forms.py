@@ -3,8 +3,8 @@ from typing import Any, Dict, List
 import aiohttp
 from pydantic import TypeAdapter
 
-from bot.config import settings
-from bot.data_models.forms import FormItem, QuestionType
+from config import settings
+from data_models.forms import FormItem, QuestionType
 
 
 class YandexFormsService:

@@ -3,7 +3,7 @@ import asyncio
 import aiohttp
 from aiogram.types import BufferedInputFile
 
-from bot.config import settings
+from config import settings
 
 
 class SpeechKitService:
