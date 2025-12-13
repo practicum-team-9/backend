@@ -53,6 +53,13 @@ www.{$SELF_URL} {
   # Serve Frontend files
   handle {
           root * /var/www/frontend
+    
+		  @css files *.css
+		  header @css Content-Type text/css
+
+		  @js files *.js
+		  header @js Content-Type application/javascript
+
           file_server
           try_files {path} {path}/ /index.html
   }
