@@ -22,6 +22,7 @@ jobs:
       CI_SELF_URL: ${{ vars.SELF_URL }}
       CI_TG_BOT_URL: ${{ vars.TG_BOT_URL }}
       CI_TLS_EMAIL: ${{ vars.TLS_EMAIL }}
+      CI_SELF_FORM_URL: ${{ vars.SELF_FORM_URL }}
     runs-on: ubuntu-latest
     steps:
       - name: 1. Checkout repository code
