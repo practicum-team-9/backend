@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     postgres_db: str = 'Название базы данных'
     tg_bot_url: str = 'Ссылка на бота'
     self_url: str = 'Домен/IP сервера'
+    self_form_url: str = 'Ссылка на конкретную страницу формы для отображения в админке'
 
     @property
     def database_url(self):

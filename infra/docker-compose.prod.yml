@@ -5,15 +5,15 @@ services:
         limits:
           memory: 512M # Hard limit. Container restart on overlimit
         reservations:
-          memory: 256M # Reserved at start
+          memory: 128M # Reserved at start
 
   backend:
     deploy:
       resources:
         limits:
-          memory: 512M # Hard limit. Container restart on overlimit
+          memory: 1G # Hard limit. Container restart on overlimit
         reservations:
-          memory: 128M # Reserved at start
+          memory: 256M # Reserved at start
     networks:
       - proxy-net
 
@@ -34,6 +34,12 @@ services:
       - "443:443"
     networks:
       - proxy-net
+    deploy:
+      resources:
+        limits:
+          memory: 256M # Hard limit. Container restart on overlimit
+        reservations:
+          memory: 64M # Reserved at start
 
 volumes:
   caddy-config:
