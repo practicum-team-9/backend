@@ -7,10 +7,10 @@ from services.speechkit import SpeechKitService
 from services.yandex_forms import YandexFormsService
 from states.form_states import FormFilling
 
-from bot.data_models.forms import FormItem, QuestionType
-from bot.database.db_manager import DatabaseManager
-from bot.keyboards import get_keyboard_buttons, get_keyboard_by_buttons
-from bot.texts import (BOOL_QUESTION, CHOICE_QUESTION, COMPLETION_MESSAGE,
+from data_models.forms import FormItem, QuestionType
+from database.db_manager import DatabaseManager
+from keyboards import get_keyboard_buttons, get_keyboard_by_buttons
+from texts import (BOOL_QUESTION, CHOICE_QUESTION, COMPLETION_MESSAGE,
                        DATE_QUESTION, OPTIONAL_QUESTION, REQUIRED_QUESTION,
                        RETRY_SURVEY, SKIP_QUESTION, START_EMOGI_BUTTON,
                        START_SURVEY, STRING_QUESTION, SUBMIT_ERROR_MESSAGE,

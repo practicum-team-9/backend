@@ -6,7 +6,7 @@ from handlers.form_handlers import FormHandlers
 from services.speechkit import SpeechKitService
 from services.yandex_forms import YandexFormsService
 
-from bot.config import settings
+from config import settings
 
 
 async def main():
